@@ -22,6 +22,8 @@ import time
 from fvcore.nn import FlopCountAnalysis
 from fvcore.nn import flop_count_table, flop_count_str
 
+import shutil
+import os
 # train_transforms = transforms.Compose(
 #     [
 #          data_transforms.PointcloudScaleAndTranslate(),
@@ -91,7 +93,7 @@ def calculate_total_param(base_model):
     print("##################TOTAL PARAMETER NUMBER: " + str(k))
 
 def run_net(args, config, train_writer=None, val_writer=None):
-    if config.dataset.train._base_.NAME == "ModelNet": # ModelNet
+    if config.dataset.train._base_.NAME == "ModelNet" or config.dataset.train._base_.NAME == "BGSPCD": # ModelNet
         train_transforms = transforms.Compose([
             # data_transforms.PointcloudRotate(),
             data_transforms.PointcloudScaleAndTranslate(),
@@ -101,7 +103,7 @@ def run_net(args, config, train_writer=None, val_writer=None):
             data_transforms.PointcloudRotate(),
             # data_transforms.PointcloudScaleAndTranslate(),
         ])
-    print("train_transforms: ", train_transforms)
+    # print("train_transforms: ", train_transforms)
     logger = get_logger(args.log_name)
     # build dataset
     (train_sampler, train_dataloader), (_, test_dataloader),= builder.dataset_builder(args, config.dataset.train), \
@@ -281,6 +283,18 @@ def run_net(args, config, train_writer=None, val_writer=None):
                         builder.save_checkpoint(base_model, optimizer, epoch, metrics, best_metrics_vote, 'ckpt-best_vote', args, logger = logger)
 
         builder.save_checkpoint(base_model, optimizer, epoch, metrics, best_metrics, 'ckpt-last', args, logger = logger)
+
+        if epoch == 50:
+            shutil.copy(os.path.join(args.experiment_path, 'ckpt-best' + '.pth'), os.path.join(args.experiment_path, 'ckpt-best-50' + '.pth'))
+        if epoch == 100:
+            shutil.copy(os.path.join(args.experiment_path, 'ckpt-best' + '.pth'), os.path.join(args.experiment_path, 'ckpt-best-100' + '.pth'))
+        if epoch == 150:
+            shutil.copy(os.path.join(args.experiment_path, 'ckpt-best' + '.pth'), os.path.join(args.experiment_path, 'ckpt-best-150' + '.pth'))
+        if epoch == 200:
+            shutil.copy(os.path.join(args.experiment_path, 'ckpt-best' + '.pth'), os.path.join(args.experiment_path, 'ckpt-best-200' + '.pth'))
+        if epoch == 250:
+            shutil.copy(os.path.join(args.experiment_path, 'ckpt-best' + '.pth'), os.path.join(args.experiment_path, 'ckpt-best-250' + '.pth'))
+
         print_log('[BEST MODEL] acc = %.6f' % (best_metrics.acc), logger=logger)  
         GB = 1024. * 1024. * 1024.
         gpu_memory = torch.cuda.max_memory_allocated()/GB
@@ -361,7 +375,7 @@ def validate(base_model, test_dataloader, epoch, val_writer, args, config, logge
 
 
 def validate_vote(base_model, test_dataloader, epoch, val_writer, args, config, logger = None, times = 10):
-    if config.dataset.train._base_.NAME == "ModelNet": # ModelNet
+    if config.dataset.train._base_.NAME == "ModelNet" or config.dataset.train._base_.NAME == "BGSPCD": # ModelNet
         test_transforms = transforms.Compose([
             # data_transforms.PointcloudRotate(),
             data_transforms.PointcloudScaleAndTranslate(),
@@ -511,7 +525,7 @@ def test(base_model, test_dataloader, args, config, logger = None):
         print_log('[TEST_VOTE] acc = %.4f' % acc, logger=logger)
 
 def test_vote(base_model, test_dataloader, epoch, val_writer, args, config, logger = None, times = 10):
-    if config.dataset.train._base_.NAME == "ModelNet": # ModelNet
+    if config.dataset.train._base_.NAME == "ModelNet" or config.dataset.train._base_.NAME == "BGSPCD": # ModelNet
         test_transforms = transforms.Compose([
             # data_transforms.PointcloudRotate(),
             data_transforms.PointcloudScaleAndTranslate(),

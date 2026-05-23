@@ -18,6 +18,7 @@ except ImportError:
     
 import sys
 sys.path.append(r"/home/Mamba3D/models/bimamba_ssm")
+# sys.path.append(r"/root/code/Mamba3D/models/bimamba_ssm")
 from ops.selective_scan_interface import selective_scan_fn, mamba_inner_fn, bimamba_inner_fn, mamba_inner_fn_no_out_proj
 # except ImportError:
 #     selective_scan_fn, mamba_inner_fn, bimamba_inner_fn, mamba_inner_fn_no_out_proj = None, None, None, None
